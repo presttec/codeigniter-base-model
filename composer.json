@@ -35,5 +35,6 @@
         "post-update-cmd": [
             "@install-application-core"
         ]
-    }
+    },
+    "prefer-stable": true
 }
