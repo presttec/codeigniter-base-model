@@ -9,7 +9,7 @@
         "issues": "https://github.com/presttec/codeigniter-base-model/issues",
         "source": "https://github.com/presttec/codeigniter-base-model"
     },
-    "minimum-stability": "stable",	
+    "minimum-stability": "dev",	
     "authors": [
         {
             "name": "PrestTEC"
