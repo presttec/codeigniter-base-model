@@ -79,6 +79,14 @@ The full list of observers are as follows:
 * $before_delete
 * $after_delete
 
+* $before_table_create;
+* $after_table_create;
+
+* $before_json_fields;
+* $before_json_action;
+* $before_json_joins;
+
+
 These are instance variables usually defined at the class level. They are arrays of methods on this class to be called at certain points. An example:
 
 ```php

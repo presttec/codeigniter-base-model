@@ -59,6 +59,7 @@ class MY_Model extends CI_Model {
     protected $before_delete = array();
     protected $after_delete = array();
     protected $callback_parameters = array();
+	
     protected $before_table_create = array();
     protected $after_table_create = array();
 
@@ -905,7 +906,12 @@ class MY_Model extends CI_Model {
         $this->datatables->select(implode(',', $fields));
         $this->datatables->from($this->_table);
         //add this line for join
+		$joins = $this->trigger('before_json_joins', array());
+		foreach($joins as $join){
+			$this->datatables->join($join['table'], $join['table_field']);
+		}
         //$this->datatables->join('table2', 'banks.field = table2.field');
+		
 		$action = array();
 		$links[] = array('href' => site_url('table/read/$1'), 'text' =>  'Ver', 'attributes ' = > '') // for read
 		$links[] = array('href' => site_url('table/update/$1'), 'text' =>  'Editar', 'attributes ' = > '') // for Edit
