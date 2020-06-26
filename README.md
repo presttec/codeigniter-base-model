@@ -88,7 +88,9 @@ class Book_model extends MY_Model
     
     protected function timestamps($book)
     {
-        $book['created_at'] = $book['updated_at'] = date('Y-m-d H:i:s');
+		$book['modified_user_id'] = $this->user->id;
+		$book['date_modified'] = date('Y-m-d H:i:s');
+        $book['date_entered'] = $book['date_modified'] = date('Y-m-d H:i:s');
         return $book;
     }
 }
