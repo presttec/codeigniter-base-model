@@ -15,9 +15,6 @@
     "conflict": {
         "jamierumbelow/codeigniter-base-model": "*"
     },
-    "replace": {
-        "jamierumbelow/codeigniter-base-model": "*"
-    },
     "require": {
         "php": ">=5.6"
     },
