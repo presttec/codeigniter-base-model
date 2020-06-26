@@ -12,7 +12,7 @@
             "email": "contato@presttec.com.br"
         }
     ],
-    "conflicts": {
+    "conflict": {
         "jamierumbelow/codeigniter-base-model": "*"
     },
     "require": {
