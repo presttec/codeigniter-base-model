@@ -62,6 +62,10 @@ class MY_Model extends CI_Model {
     protected $before_table_create = array();
     protected $after_table_create = array();
 
+    protected $before_json_fields = array();
+    protected $before_json_action = array();
+    protected $before_json_joins = array();
+
     /**
      * Protected, non-modifiable attributes
      */
@@ -117,6 +121,7 @@ class MY_Model extends CI_Model {
 		$this->load->dbforge();
 
         $this->load->helper('inflector');
+		$this->load->helper('url');
 		
         $this->load->library('uuid');
 		$this->load->library('ion_auth');
@@ -621,9 +626,9 @@ class MY_Model extends CI_Model {
      */
     public function created_at($row) {
         if (is_object($row)) {
-            $row->created_at = date('Y-m-d H:i:s');
+            $row->date_entered = date('Y-m-d H:i:s');
         } else {
-            $row['created_at'] = date('Y-m-d H:i:s');
+            $row['date_entered'] = date('Y-m-d H:i:s');
         }
 
         return $row;
@@ -631,9 +636,9 @@ class MY_Model extends CI_Model {
 
     public function updated_at($row) {
         if (is_object($row)) {
-            $row->updated_at = date('Y-m-d H:i:s');
+            $row->date_modified = date('Y-m-d H:i:s');
         } else {
-            $row['updated_at'] = date('Y-m-d H:i:s');
+            $row['date_modified'] = date('Y-m-d H:i:s');
         }
 
         return $row;
@@ -892,6 +897,29 @@ class MY_Model extends CI_Model {
     function list_fields() {
         return $this->db->list_fields($this->_table);
     }
+    // datatables
+    function json() {
+		$fields = $this->list_fields();
+        $fields = $this->trigger('before_json_fields', $fields);
+		
+        $this->datatables->select(implode(',', $fields));
+        $this->datatables->from($this->_table);
+        //add this line for join
+        //$this->datatables->join('table2', 'banks.field = table2.field');
+		$action = array();
+		$links[] = array('href' => site_url('table/read/$1'), 'text' =>  'Ver', 'attributes ' = > '') // for read
+		$links[] = array('href' => site_url('table/update/$1'), 'text' =>  'Editar', 'attributes ' = > '') // for Edit
+		$links[] = array('href' => site_url('table/update/$1'), 'text' =>  'Editar', 'attributes ' = > 'onclick="javasciprt: return confirm(\'Are You Sure ?\')"') // for Edit
+
+        $links = $this->trigger('before_json_action', implode(' | ', $links));
+		$action = array();
+		foreach($links as $link){
+			$action[] = anchor($link['href'], $link['text'], $link['attributes ']);
+		}
+        $this->datatables->add_column('action', implode(' | ', $action), 'id');
+        return $this->datatables->generate();
+    }
+	
 	public function postServer($url , $fields){
 		$fields_string = '';
 		foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
