@@ -14,12 +14,6 @@
     "require": {
         "php": ">=5.6"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:presttec/codeigniter-base-model.git"
-        }
-    ],
     "scripts": {
         "install-application-core": [
             "cp -p vendor/presttec/codeigniter-base-model/application/core/MY_Model.php application/core/"
