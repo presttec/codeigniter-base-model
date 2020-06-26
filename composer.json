@@ -21,6 +21,7 @@
             "cp -p vendor/presttec/codeigniter-base-model/application/helpers/exportexcel_helper.php application/helpers/",
             "cp -p vendor/presttec/codeigniter-base-model/application/libraries/Datatables.php application/libraries/",
             "cp -p vendor/presttec/codeigniter-base-model/application/libraries/Uuid.php application/libraries/"
+            "cp -p vendor/presttec/codeigniter-base-model/application/libraries/Pdf.php application/libraries/"
         ],
         "post-install-cmd": [
             "@install-application-coreh"
