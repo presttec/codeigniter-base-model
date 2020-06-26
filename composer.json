@@ -1,5 +1,5 @@
 {
-    "version": "2.0.0",
+    "version": "2.0.1",
     "minimum-stability": "dev",
     "name": "presttec/codeigniter-base-model",
     "description": "CodeIgniter base CRUD model to remove repetition and increase productivityCodeIgniter base CRUD model to remove repetition and increase productivity",
