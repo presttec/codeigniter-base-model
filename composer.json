@@ -1,8 +1,9 @@
 {
-    "version": "2.0.1",
+    "version": "2.0.2",
     "minimum-stability": "dev",
     "name": "presttec/codeigniter-base-model",
     "description": "CodeIgniter base CRUD model to remove repetition and increase productivityCodeIgniter base CRUD model to remove repetition and increase productivity",
+	"keywords": ["codeigniter", "model", "crud", "base", "my_model", "datatables"],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -11,6 +12,9 @@
             "email": "contato@presttec.com.br"
         }
     ],
+    "conflicts": {
+        "jamierumbelow/codeigniter-base-model": "*"
+    },
     "require": {
         "php": ">=5.6"
     },
