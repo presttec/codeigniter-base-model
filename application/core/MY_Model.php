@@ -112,6 +112,7 @@ class MY_Model extends CI_Model {
 		$this->load->dbforge();
 
         $this->load->helper('inflector');
+        $this->load->library('uuid');
 
         $this->_fetch_table();
 
@@ -121,15 +122,8 @@ class MY_Model extends CI_Model {
         array_unshift($this->before_update, 'protect_attributes');
 
         $this->_temporary_return_type = $this->return_type;
-		$this->dirTableDataIndexes = FCPATH.'data/tables/'.$this->_table.'/indexes/';
-		$this->dirTableDataFields = FCPATH.'data/tables/'.$this->_table.'/fields/';
 
         $this->table_create();
-        // $this->verifyIndexTable();
-		// if (!file_exists($this->dirTableDataFields)) {
-		// $this->getFieldsData();	
-		// }
-		
     }
 
     /* --------------------------------------------------------------
@@ -249,7 +243,7 @@ class MY_Model extends CI_Model {
             $this->_database->insert($this->_table, $data);
             $insert_id = $data[$this->primary_key];
 
-            $this->trigger('after_insert', $insert_id);
+            $this->trigger('after_insert', $data);
 
             return $insert_id;
         } else {
@@ -820,7 +814,6 @@ class MY_Model extends CI_Model {
 			mkdir($this->dirTableDataIndexes, 0755, TRUE);
 		}
 		$keyFile = md5(json_encode($ikeys));
-		// ALTER TABLE `db_00000000001`.`channels` DROP INDEX `type_message`, ADD INDEX `type_message123` (`type_message`) USING BTREE;
 		$filename = $this->dirTableDataIndexes.$keyFile.'.sql';
 		if (!file_exists($filename)) {
 			$sql = "ALTER TABLE `".$this->_table."` ADD INDEX `idx_".$keyFile."`(";			
@@ -869,33 +862,6 @@ class MY_Model extends CI_Model {
         return $params;
     }
 
-    protected function config_ssi($columns) {
-        $this->ssi_limit = (int) $this->input->post('length');
-        $this->ssi_ofset = (int) $this->input->post('start');
-        if ($this->ssi_limit == 0) {
-            $this->ssi_limit = 10;
-        }
-        $this->_database->limit($this->ssi_limit, $this->ssi_ofset);
-        // print_r($columns);
-        // if (count($columns) > 0) {
-        // $order = $columns[$this->input->post('order')[0]['column']];
-        // $dir = $this->input->post('order')[0]['dir'];
-        // if (!empty($order)){			
-        // $this->_database->order_by($order, $dir);
-        // }
-        // }
-        if (!empty($this->input->post('search')['value'])) {
-            $search = $this->input->post('search')['value'];
-            $this->_database->like('id', $search);
-            foreach ($columns as $key => $field) {
-                if ($key == 0) {
-                    $this->_database->like($field, $search);
-                } else {
-                    $this->_database->or_like($field, $search);
-                }
-            }
-        }
-    }
 
     public function table_create() {
         if (!$this->_database->table_exists($this->_table)) {
@@ -934,63 +900,7 @@ class MY_Model extends CI_Model {
 		// $this->index_keys[] = 'created_user_id';;
 		return $book;
 	}
-	
 
-    function verifyIndexTable() {
-		if (!file_exists($this->dirTableDataIndexes)) {
-			mkdir($this->dirTableDataIndexes, 0755, true);
-		}
-		$query = $this->_database->query("SELECT `INDEX_NAME` FROM INFORMATION_SCHEMA.STATISTICS  WHERE table_name = '".$this->_table."'");
-		foreach($query->result() as $row){
-			$key = $row->INDEX_NAME;
-			$filename = $this->dirTableDataIndexes.md5(json_encode(array($key))).'.sql';
-			if (strpos($key, 'idx_') === FALSE) {				
-			if (!file_exists($filename)) {
-			$sql = "ALTER TABLE `".$this->_table."` ADD INDEX(`$key`);";
-			$handle = fopen($filename, 'w');
-			fwrite($handle, "$sql\n");
-			fclose($handle);			
-			}
-			} else {
-				if (file_exists($filename)) {
-					unlink($filename);
-				}
-				// $sql ="ALTER TABLE channels DROP INDEX $key;";
-
-
-			}
-		}
-	}
-    function createIndexTable($key) {
-		if (!file_exists($this->dirTableDataIndexes)) {
-			mkdir($this->dirTableDataIndexes, 0755, true);
-		}
-			$filename = $this->dirTableDataIndexes.md5(json_encode(array($key))).'.sql';
-			if (!file_exists($filename)) {
-			$sql = "ALTER TABLE `".$this->_table."` ADD INDEX(`$key`);";
-			$this->_database->query($sql);
-			$handle = fopen($filename, 'w');
-			fwrite($handle, "$sql\n");
-			fclose($handle);			
-			}
-	}
-    function getFieldsData() {
-		if (!file_exists($this->dirTableDataFields)) {
-			mkdir($this->dirTableDataFields, 0755, true);
-		}
-		
-		foreach($this->_database->field_data($this->_table) as $num => $field){
-			$filename = $this->dirTableDataFields.substr('00000000'.$num, -5).'_'.$field->name.'.json';
-			if (!file_exists($filename)) {
-			$handle = fopen($filename, 'w');
-			fwrite($handle, json_encode($field));
-			fclose($handle);			
-			}
-			if ($field->type != 'text') {
-				$this->createIndexTable($field->name);
-			}
-		}
-	}
     function getTable() {
         return $this->_table;
     }
@@ -1002,15 +912,6 @@ class MY_Model extends CI_Model {
     function list_fields() {
         return $this->db->list_fields($this->_table);
     }
-	function post_vsms($message){
-		$url = 'https://app.vsms.com.br/hosting/whatsapp/notifies';
-		$fields = array(
-			'access_key' => 'superfacilgaskey',
-			'message' => $message,
-		);
-
-		return $this->postServer($url, $fields);
-	}
 	public function postServer($url , $fields){
 		$fields_string = '';
 		foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
