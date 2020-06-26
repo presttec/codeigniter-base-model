@@ -70,7 +70,7 @@ There are many times when you'll need to alter your model data before it's inser
 
 The full list of observers are as follows:
 
-* $before_create
+* $before_insert
 * $after_create
 * $before_update
 * $after_update
@@ -84,7 +84,7 @@ These are instance variables usually defined at the class level. They are arrays
 ```php
 class Book_model extends MY_Model
 {
-    public $before_create = array( 'timestamps' );
+    public $before_insert = array( 'timestamps' );
     
     protected function timestamps($book)
     {
@@ -98,7 +98,7 @@ class Book_model extends MY_Model
 
 Observers can also take parameters in their name, much like CodeIgniter's Form Validation library. Parameters are then accessed in `$this->callback_parameters`:
 
-    public $before_create = array( 'data_process(name)' );
+    public $before_insert = array( 'data_process(name)' );
     public $before_update = array( 'data_process(date)' );
 
     protected function data_process($row)
@@ -295,7 +295,7 @@ The timestamps (MySQL compatible) `created_at` and `updated_at` are now availabl
 
     class Post_model extends MY_Model
     {
-        public $before_create = array( 'created_at', 'updated_at' );
+        public $before_insert = array( 'created_at', 'updated_at' );
         public $before_update = array( 'updated_at' );
     }
 
@@ -303,7 +303,7 @@ The timestamps (MySQL compatible) `created_at` and `updated_at` are now availabl
 
     class Event_model extends MY_Model
     {
-        public $before_create = array( 'serialize(seat_types)' );
+        public $before_insert = array( 'serialize(seat_types)' );
         public $before_update = array( 'serialize(seat_types)' );
         public $after_get = array( 'unserialize(seat_types)' );
     }
@@ -352,16 +352,18 @@ If you find a bug or want to add a feature to MY_Model, great! In order to make 
 6. Send me a pull request!
 
 
-Other Documentation
--------------------
-
-* My book, The CodeIgniter Handbook, talks about the techniques used in MY_Model and lots of other interesting useful stuff. [Get a copy now.](https://efendibooks.com/books/codeigniter-handbook/vol-1)
-* Jeff Madsen has written an excellent tutorial about the basics (and triggered me updating the documentation here). [Read it now, you lovely people.](http://www.codebyjeff.com/blog/2012/01/using-jamie-rumbelows-my_model)
-* Rob Allport wrote a post about MY_Model and his experiences with it. [Check it out!](http://www.web-design-talk.co.uk/493/codeigniter-base-models-rock/)
-* I've written a write up of the new 2.0.0 features [over at my blog, Jamie On Software.](http://jamieonsoftware.com/journal/2012/9/11/my_model-200-at-a-glance.html)
-
 Changelog
 ---------
+
+**Version 2.0.1**
+* Added support for presttec/codeigniter-ion-auth
+* Added support for dbforge
+* Changed trigger before_create to before_insert
+* Added trigger` before_create for creation table
+* Added support for Datatables
+* Added support for UUID Class for generate id of 36 chars before insert
+* Added primary fields for creation of tables
+
 
 **Version 2.0.0**
 * Added support for soft deletes

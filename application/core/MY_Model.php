@@ -15,6 +15,11 @@ class MY_Model extends CI_Model {
      * ------------------------------------------------------------ */
 
     /**
+     * User Authenticate
+     */
+    private $user;
+
+    /**
      * This model's default database table. Automatically
      * guessed by pluralising the model name.
      */
@@ -112,7 +117,9 @@ class MY_Model extends CI_Model {
 		$this->load->dbforge();
 
         $this->load->helper('inflector');
+		
         $this->load->library('uuid');
+		$this->load->library('ion_auth');
 
         $this->_fetch_table();
 
@@ -124,6 +131,8 @@ class MY_Model extends CI_Model {
         $this->_temporary_return_type = $this->return_type;
 
         $this->table_create();
+		$this->user = $this->ion_auth->user()->row();
+
     }
 
     /* --------------------------------------------------------------
@@ -219,24 +228,14 @@ class MY_Model extends CI_Model {
         }
 
         if ($data !== FALSE) {
-            if (!isset($data['created_user_id'])) {
-                $data['created_user_id'] = '0e51f946-8555-47bf-9b33-adb8ede90459';
-            }
-            if (!isset($data['modified_user_id'])) {
-                $data['modified_user_id'] = '0e51f946-8555-47bf-9b33-adb8ede90459';
-            }
-            if (!isset($data['assigned_user_id'])) {
-                $data['assigned_user_id'] = '0e51f946-8555-47bf-9b33-adb8ede90459';
-            }
-            if (empty($data['created_user_id'])) {
-                $data['created_user_id'] = '0e51f946-8555-47bf-9b33-adb8ede90459';
-            }
-            if (empty($data['modified_user_id'])) {
-                $data['modified_user_id'] = '0e51f946-8555-47bf-9b33-adb8ede90459';
-            }
-            if (empty($data['assigned_user_id'])) {
-                $data['assigned_user_id'] = '0e51f946-8555-47bf-9b33-adb8ede90459';
-            }
+			$data['id'] = $this->uuid->v4();
+			$data['created_user_id'] = $this->user->id;
+			$data['modified_user_id'] = $this->user->id;
+			$data['assigned_user_id'] = $this->user->id;
+			$data['date_entered'] = date('Y-m-d H:i:s');
+			$data['date_modified'] = $data['date_entered'];
+			$data['deleted'] = '0';
+
 
             $data = $this->trigger('before_insert', $data);
 			// print_r($data);
@@ -275,6 +274,8 @@ class MY_Model extends CI_Model {
         }
 
         if ($data !== FALSE) {
+			$data['modified_user_id'] = $this->user->id;
+			$data['date_modified'] = date('Y-m-d H:i:s');
             $result = $this->_database->where($this->primary_key, $primary_value)
                     ->set($data)
                     ->update($this->_table);
@@ -298,6 +299,8 @@ class MY_Model extends CI_Model {
         }
 
         if ($data !== FALSE) {
+			$data['modified_user_id'] = $this->user->id;
+			$data['date_modified'] = date('Y-m-d H:i:s');
             $result = $this->_database->where_in($this->primary_key, $primary_values)
                     ->set($data)
                     ->update($this->_table);
@@ -317,6 +320,8 @@ class MY_Model extends CI_Model {
         $args = func_get_args();
         $data = array_pop($args);
 
+		$data['modified_user_id'] = $this->user->id;
+		$data['date_modified'] = date('Y-m-d H:i:s');
         $data = $this->trigger('before_update', $data);
 
         if ($this->validate($data) !== FALSE) {
@@ -335,6 +340,8 @@ class MY_Model extends CI_Model {
      * Update all records
      */
     public function update_all($data) {
+		$data['modified_user_id'] = $this->user->id;
+		$data['date_modified'] = date('Y-m-d H:i:s');
         $data = $this->trigger('before_update', $data);
         $result = $this->_database->set($data)
                 ->update($this->_table);
@@ -790,13 +797,6 @@ class MY_Model extends CI_Model {
         if (is_array($params[0])) {
             $data = $params[0];
         }
-        // foreach ($params as $key => $value) {
-        // if ($key % 2 == 0) {
-        // $skey = $value;
-        // } else {
-        // $data[$skey] = $value;
-        // }
-        // }
         return $data;
     }
 
@@ -805,31 +805,10 @@ class MY_Model extends CI_Model {
      */
     protected function _set_where($params) {
         $data = $this->_prepare_clause($params);
-		$ikeys = array();
         foreach ($data as $key => $value) {
-			array_push($ikeys, $key);
             $this->_database->where($key, $value);
         }
-		if (!file_exists($this->dirTableDataIndexes)) {
-			mkdir($this->dirTableDataIndexes, 0755, TRUE);
-		}
 		$keyFile = md5(json_encode($ikeys));
-		$filename = $this->dirTableDataIndexes.$keyFile.'.sql';
-		if (!file_exists($filename)) {
-			$sql = "ALTER TABLE `".$this->_table."` ADD INDEX `idx_".$keyFile."`(";			
-            foreach ($ikeys as $key) {
-				if (strpos($key, 'idx_') !== FALSE) {
-					exit();
-				}
-				$sql .="`$key`,";
-            }
-			$sql = rtrim($sql, ',');
-			$sql .=");";
-			// $this->_database->query($sql);
-			$handle = fopen($filename, 'w');
-			fwrite($handle, "$sql\n");
-			fclose($handle);
-		}
     }
 
     /**
@@ -896,6 +875,7 @@ class MY_Model extends CI_Model {
 	}
 	
 	protected function generate_table_people($book){
+		$book = $this->generate_table_simple($book);
         // $book['id'] = array('type' => 'VARCHAR(36)', 'null' => TRUE, 'default' => NULL);
 		// $this->index_keys[] = 'created_user_id';;
 		return $book;
