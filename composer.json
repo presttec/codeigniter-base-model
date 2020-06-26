@@ -1,10 +1,15 @@
 {
     "name": "presttec/codeigniter-base-model",
     "description": "My CodeIgniter Base Model is an extended CI_Model class to use in your CodeIgniter applications. It provides a full CRUD base to make developing database interactions easier and quicker, as well as an event-based observer system, in-model data validation, intelligent table name guessing and soft delete.",
-    "minimum-stability": "dev-master",
+    "keywords": ["codeIgniter", "model", "base model", "my_model"],
     "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/presttec/codeigniter-base-model",
+    "support": {
+        "issues": "https://github.com/presttec/codeigniter-base-model/issues",
+        "source": "https://github.com/presttec/codeigniter-base-model"
+    },
+    "minimum-stability": "stable",	
     "authors": [
         {
             "name": "PrestTEC"
